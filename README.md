@@ -34,7 +34,7 @@
 
 1. Open a terminal or command prompt
 
-2. Navigate to the directory where you installed the ChatGPT Discord bot
+2. Navigate to the directory where you installed the Bard Discord bot
 
 3. Run `python3 main.py` or `python main.py` to start the bot
 
