@@ -4,7 +4,7 @@
 
 * run pip3 install -r requirements.txt
 
-* Rename the file `.env.example` to `.env`
+* Rename the file `example.env` to `.env`
 
 ## Step 1: Create a Discord bot
 
