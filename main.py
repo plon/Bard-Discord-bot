@@ -1,5 +1,5 @@
 import os
-import bardapi
+from Bard import Chatbot
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -9,8 +9,9 @@ load_dotenv()
 # Set up the Discord bot
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents, heartbeat_timeout=60)
-os.environ['_BARD_API_KEY'] = "xxxxx"
+BARD_TOKEN = os.getenv('BARD_TOKEN')
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+bard = Chatbot(BARD_TOKEN)
 
 allow_dm = True
 active_channels = set()
@@ -29,7 +30,7 @@ async def on_ready():
 
 message_id = ""
 async def generate_response(prompt):
-    response = bardapi.core.Bard().get_answer(prompt)
+    response = bard.ask(prompt)
     if not response:
         response = "I couldn't generate a response. Please try again."
     return (f"{response['content']}")
@@ -100,6 +101,14 @@ async def toggleactive(ctx):
             f.write(str(channel_id) + "\n")
         await ctx.send(
             f"{ctx.channel.mention} has been added to the list of active channels!")
+        
+@bot.hybrid_command(name="reset", description="Reset the bot's context.")
+async def reset(ctx):
+    bard.conversation_id = ""
+    bard.response_id = ""
+    bard.choice_id = ""
+    bard.ask("Start a new conversation.")
+    await ctx.send("Bot context has been reset.")
 
 # Read the active channels from channels.txt on startup
 if os.path.exists("channels.txt"):

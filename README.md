@@ -54,11 +54,10 @@
 
 ## License
 
-This program is based on the work of [mishalhossin](https://github.com/mishalhossin), [Zero6992](https://github.com/zero6992), and [dsdanielpark](https://github.com/dsdanielpark)
+This program is based on the work of [mishalhossin](https://github.com/mishalhossin), [Zero6992](https://github.com/zero6992), and [acheong08](https://github.com/acheong08)
 
 For more information, please visit the following repositories:
 
 * https://github.com/mishalhossin/Discord-Chatbot-Gpt4Free
 * https://github.com/Zero6992/chatGPT-discord-bot
-* https://github.com/dsdanielpark/Bard-API
-
+* https://github.com/acheong08/Bard
