@@ -52,7 +52,7 @@
 * `/toggledm`: Toggles direct message mode
 * `/toggleactive`: Toggles channel mode for a channel
 
-## License
+## Credits
 
 This program is based on the work of [mishalhossin](https://github.com/mishalhossin), [Zero6992](https://github.com/zero6992), and [acheong08](https://github.com/acheong08)
 
