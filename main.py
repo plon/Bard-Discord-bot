@@ -31,8 +31,9 @@ async def on_ready():
 message_id = ""
 async def generate_response(prompt):
     response = bard.ask(prompt)
-    if not response:
+    if not response or "Google Bard encountered an error" in response["content"]:
         response = "I couldn't generate a response. Please try again."
+        return response
     return (f"{response['content']}")
 
 def split_response(response, max_length=1900):
