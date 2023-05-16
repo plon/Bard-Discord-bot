@@ -51,9 +51,6 @@ def split_response(response, max_length=1900):
         chunks.append(" ".join(current_chunk))
 
     return chunks
-    
-message_history = {}
-MAX_HISTORY = 8
 
 @bot.event
 async def on_message(message):
@@ -61,19 +58,12 @@ async def on_message(message):
       return
     if message.reference and message.reference.resolved.author != bot.user:
       return  # Ignore replies to messages not from the bot
-    author_id = str(message.author.id)
-    if author_id not in message_history:
-        message_history[author_id] = []
-
-    message_history[author_id].append(message.content)
-    message_history[author_id] = message_history[author_id][-MAX_HISTORY:]
-    
     is_dm_channel = isinstance(message.channel, discord.DMChannel)
+    
     if message.channel.id in active_channels or (allow_dm and is_dm_channel):
-        user_prompt = "\n".join(message_history[author_id])
-        prompt = f"{user_prompt}\n{message.author.name}: {message.content}\n{bot.user.name}:"
+        user_prompt = message.content
         async with message.channel.typing():
-            response = await generate_response(prompt)     
+            response = await generate_response(user_prompt)     
         chunks = split_response(response)  
         for chunk in chunks:
             await message.reply(chunk)
@@ -121,7 +111,7 @@ bot.remove_command("help")
 @bot.hybrid_command(name="help", description="Get all other commands!")
 async def help(ctx):
     embed = discord.Embed(title="Bot Commands", color=0x00ff00)
-    embed.add_field(name="/clear", value="Clear bot's context.", inline=False)
+    embed.add_field(name="/reset", value="Reset bot's context.", inline=False)
     embed.add_field(name="/toggleactive", value="Add the channel you are currently in to the Active Channel List.", inline=False)   
     embed.add_field(name="/toggledm", value="Toggle if DM chatting should be active or not.", inline=False)
     
