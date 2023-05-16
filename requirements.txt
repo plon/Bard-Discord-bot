@@ -1,2 +1,3 @@
 discord
 GoogleBard
+python-dotenv
