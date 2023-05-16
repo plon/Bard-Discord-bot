@@ -97,7 +97,6 @@ async def reset(ctx):
     bard.conversation_id = ""
     bard.response_id = ""
     bard.choice_id = ""
-    bard.ask("Start a new conversation.")
     await ctx.send("Bot context has been reset.")
 
 # Read the active channels from channels.txt on startup
