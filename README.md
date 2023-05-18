@@ -51,6 +51,12 @@
 * `/help`: Displays a list of all available commands
 * `/toggledm`: Toggles direct message mode
 * `/toggleactive`: Toggles channel mode for a channel
+* `/chat`: Chat with Bard
+* `/reset`: Reset bot's context
+* `/togglechannel`: Add the channel you are currently in to the Active Channel List
+* `/toggledm`: Toggle if DM chatting should be active
+* `/public`: Toggle if bot should respond to all messages in chat
+* `/private`: Toggle if bot should only respond to /chat
 
 ## Credits
 
