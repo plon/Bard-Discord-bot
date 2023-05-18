@@ -1,6 +1,7 @@
 import os
 from Bard import Chatbot
 import discord
+import time
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -14,6 +15,7 @@ TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 bard = Chatbot(BARD_TOKEN)
 
 allow_dm = True
+reply_all = True
 active_channels = set()
 
 @bot.event
@@ -30,14 +32,12 @@ async def on_ready():
 
 message_id = ""
 async def generate_response(prompt):
+    max_length = 1900
     response = bard.ask(prompt)
     if not response or "Google Bard encountered an error" in response["content"]:
         response = "I couldn't generate a response. Please try again."
         return response
-    return (f"{response['content']}")
-
-def split_response(response, max_length=1900):
-    words = response.split()
+    words = response["content"].split()
     chunks = []
     current_chunk = []
 
@@ -55,19 +55,19 @@ def split_response(response, max_length=1900):
 
 @bot.event
 async def on_message(message):
-    if message.author.bot:
-      return
-    if message.reference and message.reference.resolved.author != bot.user:
-      return  # Ignore replies to messages not from the bot
-    is_dm_channel = isinstance(message.channel, discord.DMChannel)
+    if reply_all:
+        if message.author.bot:
+            return
+        if message.reference and message.reference.resolved.author != bot.user:
+            return  # Ignore replies to messages not from the bot
+        is_dm_channel = isinstance(message.channel, discord.DMChannel)
     
-    if message.channel.id in active_channels or (allow_dm and is_dm_channel):
-        user_prompt = message.content
-        async with message.channel.typing():
-            response = await generate_response(user_prompt)     
-        chunks = split_response(response)  
-        for chunk in chunks:
-            await message.reply(chunk)
+        if message.channel.id in active_channels or (allow_dm and is_dm_channel):
+            user_prompt = message.content
+            async with message.channel.typing():
+                response = await generate_response(user_prompt)
+            for chunk in response:
+                await message.reply(chunk)
 
 @bot.hybrid_command(name="toggledm", description="Toggle DM for chatting.")
 async def toggledm(ctx):
@@ -75,7 +75,7 @@ async def toggledm(ctx):
     allow_dm = not allow_dm
     await ctx.send(f"DMs are now {'allowed' if allow_dm else 'disallowed'} for active channels.")
     
-@bot.hybrid_command(name="toggleactive", description="Toggle active channels.")
+@bot.hybrid_command(name="togglechannel", description="Toggle active channels.")
 async def toggleactive(ctx):
     channel_id = ctx.channel.id
     if channel_id in active_channels:
@@ -107,13 +107,50 @@ if os.path.exists("channels.txt"):
             channel_id = int(line.strip())
             active_channels.add(channel_id)
 
+@bot.hybrid_command(name="public", description="Toggle if bot should only respond to /chat or all messages in chat.")
+async def public(ctx):
+    global reply_all
+    if not reply_all:
+        reply_all = True 
+        await ctx.send(f"Bot will now respond to all messages in chat.")
+    else:
+        await ctx.send(f"Bot is already in public mode.")
+
+@bot.hybrid_command(name="private", description="Toggle if bot should only respond to /chat or all messages in chat.")
+async def private(ctx):
+    global reply_all
+    if reply_all:
+        reply_all = False 
+        await ctx.send(f"Bot will now only respond to /chat.")
+    else:
+        await ctx.send(f"Bot is already in private mode.")
+
+
+@bot.tree.command(name="chat", description="Have a chat with Bard")
+async def chat(interaction: discord.Interaction, *, message: str):
+    time.sleep(0.000001)
+    is_dm_channel = isinstance(interaction.channel, discord.DMChannel)
+    if interaction.user == bot.user:
+        return
+    if interaction.channel.id in active_channels or (allow_dm & is_dm_channel):
+        allowed_mentions = discord.AllowedMentions(users=False)
+        interaction_response = (f'> **{message}** - {interaction.user.mention} \n\n')      
+        response = await generate_response(message)
+        await interaction.response.send_message(interaction_response, allowed_mentions=allowed_mentions)
+        for chunk in response:
+            await interaction.channel.send(chunk)
+
+
 bot.remove_command("help")   
 @bot.hybrid_command(name="help", description="Get all other commands!")
 async def help(ctx):
     embed = discord.Embed(title="Bot Commands", color=0x00ff00)
+    embed.add_field(name="/chat", value="Have a chat with Bard.", inline=False)
     embed.add_field(name="/reset", value="Reset bot's context.", inline=False)
-    embed.add_field(name="/toggleactive", value="Add the channel you are currently in to the Active Channel List.", inline=False)   
+    embed.add_field(name="/togglechannel", value="Add the channel you are currently in to the Active Channel List.", inline=False)   
     embed.add_field(name="/toggledm", value="Toggle if DM chatting should be active or not.", inline=False)
+    embed.add_field(name="/public", value ="Toggle if bot should respond to all messages in chat", inline=False)
+    embed.add_field(name="/private", value ="Toggle if bot should only respond to /chat or not.", inline=False)
     
     await ctx.send(embed=embed)
 
