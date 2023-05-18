@@ -1,7 +1,6 @@
 import os
 from Bard import Chatbot
 import discord
-import time
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -127,8 +126,8 @@ async def private(ctx):
 
 
 @bot.tree.command(name="chat", description="Have a chat with Bard")
-async def chat(interaction: discord.Interaction, *, message: str):
-    time.sleep(0.000001)
+async def chat(interaction: discord.Interaction, message: str):
+    await interaction.response.defer()
     is_dm_channel = isinstance(interaction.channel, discord.DMChannel)
     if interaction.user == bot.user:
         return
@@ -136,7 +135,7 @@ async def chat(interaction: discord.Interaction, *, message: str):
         allowed_mentions = discord.AllowedMentions(users=False)
         interaction_response = (f'> **{message}** - {interaction.user.mention} \n\n')      
         response = await generate_response(message)
-        await interaction.response.send_message(interaction_response, allowed_mentions=allowed_mentions)
+        await interaction.followup.send(interaction_response, allowed_mentions=allowed_mentions)
         for chunk in response:
             await interaction.channel.send(chunk)
 
@@ -148,9 +147,9 @@ async def help(ctx):
     embed.add_field(name="/chat", value="Have a chat with Bard.", inline=False)
     embed.add_field(name="/reset", value="Reset bot's context.", inline=False)
     embed.add_field(name="/togglechannel", value="Add the channel you are currently in to the Active Channel List.", inline=False)   
-    embed.add_field(name="/toggledm", value="Toggle if DM chatting should be active or not.", inline=False)
+    embed.add_field(name="/toggledm", value="Toggle if DM chatting should be active", inline=False)
     embed.add_field(name="/public", value ="Toggle if bot should respond to all messages in chat", inline=False)
-    embed.add_field(name="/private", value ="Toggle if bot should only respond to /chat or not.", inline=False)
+    embed.add_field(name="/private", value ="Toggle if bot should only respond to /chat", inline=False)
     
     await ctx.send(embed=embed)
 
