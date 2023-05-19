@@ -2,19 +2,21 @@ import os
 from Bard import Chatbot
 import discord
 from discord.ext import commands
-from dotenv import load_dotenv
+import dotenv
 
-load_dotenv()
+dotenv.load_dotenv()
 
 # Set up the Discord bot
+dotenv_file = dotenv.find_dotenv()
+dotenv.load_dotenv(dotenv_file)
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents, heartbeat_timeout=60)
 BARD_TOKEN = os.getenv('BARD_TOKEN')
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 bard = Chatbot(BARD_TOKEN)
+reply_all = os.environ["REPLY_ALL"]
 
 allow_dm = True
-reply_all = True
 active_channels = set()
 
 @bot.event
@@ -54,6 +56,7 @@ async def generate_response(prompt):
 
 @bot.event
 async def on_message(message):
+    reply_all = os.environ.get('REPLY_ALL', '').lower() == 'true'
     if reply_all:
         if message.author.bot:
             return
@@ -109,8 +112,11 @@ if os.path.exists("channels.txt"):
 @bot.hybrid_command(name="public", description="Toggle if bot should only respond to /chat or all messages in chat.")
 async def public(ctx):
     global reply_all
-    if not reply_all:
+    if os.environ.get('REPLY_ALL', '').lower() == 'false':
         reply_all = True 
+        dotenv.set_key(dotenv_file, "REPLY_ALL", str(reply_all))
+        os.environ['REPLY_ALL'] = str(reply_all)
+        print(os.environ['REPLY_ALL'])
         await ctx.send(f"Bot will now respond to all messages in chat.")
     else:
         await ctx.send(f"Bot is already in public mode.")
@@ -118,12 +124,14 @@ async def public(ctx):
 @bot.hybrid_command(name="private", description="Toggle if bot should only respond to /chat or all messages in chat.")
 async def private(ctx):
     global reply_all
-    if reply_all:
+    if os.environ.get('REPLY_ALL', '').lower() == 'true':
         reply_all = False 
+        dotenv.set_key(dotenv_file, "REPLY_ALL", str(reply_all))
+        os.environ['REPLY_ALL'] = str(reply_all)
+        print(os.environ['REPLY_ALL'])
         await ctx.send(f"Bot will now only respond to /chat.")
     else:
         await ctx.send(f"Bot is already in private mode.")
-
 
 @bot.tree.command(name="chat", description="Have a chat with Bard")
 async def chat(interaction: discord.Interaction, message: str):
@@ -138,7 +146,6 @@ async def chat(interaction: discord.Interaction, message: str):
         await interaction.followup.send(interaction_response, allowed_mentions=allowed_mentions)
         for chunk in response:
             await interaction.channel.send(chunk)
-
 
 bot.remove_command("help")   
 @bot.hybrid_command(name="help", description="Get all other commands!")
