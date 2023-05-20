@@ -33,7 +33,7 @@ message_id = ""
 async def generate_response(prompt):
     max_length = 1900
     response = bard.ask(prompt)
-    if not response or "Google Bard encountered an error" in response["content"] or :
+    if not response or "Google Bard encountered an error" in response["content"]:
         response = "I couldn't generate a response. Please try again."
         return response
     words = response["content"].split()
