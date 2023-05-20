@@ -4,8 +4,6 @@ import discord
 from discord.ext import commands
 import dotenv
 
-dotenv.load_dotenv()
-
 # Set up the Discord bot
 dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
@@ -35,7 +33,7 @@ message_id = ""
 async def generate_response(prompt):
     max_length = 1900
     response = bard.ask(prompt)
-    if not response or "Google Bard encountered an error" in response["content"]:
+    if not response or "Google Bard encountered an error" in response["content"] or :
         response = "I couldn't generate a response. Please try again."
         return response
     words = response["content"].split()
@@ -145,7 +143,10 @@ async def chat(interaction: discord.Interaction, message: str):
         response = await generate_response(message)
         await interaction.followup.send(interaction_response, allowed_mentions=allowed_mentions)
         for chunk in response:
-            await interaction.channel.send(chunk)
+            try:
+                await interaction.channel.send(chunk)
+            except discord.errors.HTTPException:
+                await interaction.channel.send("I couldn't generate a response. Please try again.")
 
 bot.remove_command("help")   
 @bot.hybrid_command(name="help", description="Get all other commands!")
