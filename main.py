@@ -9,10 +9,11 @@ dotenv_file = dotenv.find_dotenv()
 dotenv.load_dotenv(dotenv_file)
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents, heartbeat_timeout=60)
-BARD_TOKEN = os.getenv('BARD_TOKEN')
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+BARD_TOKEN = os.environ.get('BARD_TOKEN')
+TOKEN = os.environ.get('DISCORD_BOT_TOKEN')
 bard = Chatbot(BARD_TOKEN)
-reply_all = os.environ["REPLY_ALL"]
+reply_all = os.environ.get("REPLY_ALL")
+use_images = os.environ.get("USE_IMAGES")
 
 allow_dm = True
 active_channels = set()
@@ -30,12 +31,15 @@ async def on_ready():
     print(f"Invite link: {invite_link}")
 
 message_id = ""
+images = []
 async def generate_response(prompt):
+    global images 
     max_length = 1900
     response = bard.ask(prompt)
     if not response or "Google Bard encountered an error" in response["content"]:
         response = "I couldn't generate a response. Please try again."
         return response
+    images = response["images"]
     words = response["content"].split()
     chunks = []
     current_chunk = []
@@ -54,6 +58,7 @@ async def generate_response(prompt):
 
 @bot.event
 async def on_message(message):
+    global images
     reply_all = os.environ.get('REPLY_ALL', '').lower() == 'true'
     if reply_all:
         if message.author.bot:
@@ -68,6 +73,10 @@ async def on_message(message):
                 response = await generate_response(user_prompt)
             for chunk in response:
                 await message.reply(chunk)
+            if use_images.lower() == 'true':
+                if images:
+                    for image in images:
+                        await message.reply(image)
 
 @bot.hybrid_command(name="toggledm", description="Toggle DM for chatting.")
 async def toggledm(ctx):
@@ -114,10 +123,11 @@ async def public(ctx):
         reply_all = True 
         dotenv.set_key(dotenv_file, "REPLY_ALL", str(reply_all))
         os.environ['REPLY_ALL'] = str(reply_all)
-        print(os.environ['REPLY_ALL'])
         await ctx.send(f"Bot will now respond to all messages in chat.")
+        return
     else:
         await ctx.send(f"Bot is already in public mode.")
+        return
 
 @bot.hybrid_command(name="private", description="Toggle if bot should only respond to /chat or all messages in chat.")
 async def private(ctx):
@@ -126,13 +136,31 @@ async def private(ctx):
         reply_all = False 
         dotenv.set_key(dotenv_file, "REPLY_ALL", str(reply_all))
         os.environ['REPLY_ALL'] = str(reply_all)
-        print(os.environ['REPLY_ALL'])
         await ctx.send(f"Bot will now only respond to /chat.")
+        return
     else:
         await ctx.send(f"Bot is already in private mode.")
+        return
+
+@bot.hybrid_command(name="images", description="Toggle if bot should respond with images")
+async def images(ctx):
+    global use_images
+    if os.environ.get('USE_IMAGES', '').lower() == 'false':
+        use_images = 'true'
+        dotenv.set_key(dotenv_file, "USE_IMAGES", str(use_images))
+        os.environ['USE_IMAGES'] = str(use_images)
+        await ctx.send(f"Bot will now respond with images.")
+        return
+    if os.environ.get('USE_IMAGES', '').lower() == 'true':
+        use_images = 'false'
+        dotenv.set_key(dotenv_file, "USE_IMAGES", str(use_images))
+        os.environ['USE_IMAGES'] = str(use_images)
+        await ctx.send(f"Bot will now respond with text.")
+        return
 
 @bot.tree.command(name="chat", description="Have a chat with Bard")
 async def chat(interaction: discord.Interaction, message: str):
+    global images
     await interaction.response.defer()
     is_dm_channel = isinstance(interaction.channel, discord.DMChannel)
     if interaction.user == bot.user:
@@ -147,6 +175,10 @@ async def chat(interaction: discord.Interaction, message: str):
                 await interaction.channel.send(chunk)
             except discord.errors.HTTPException:
                 await interaction.channel.send("I couldn't generate a response. Please try again.")
+        if use_images.lower() == 'true':
+            if images:
+                for image in images:
+                    await interaction.channel.send(image)
 
 bot.remove_command("help")   
 @bot.hybrid_command(name="help", description="Get all other commands!")
