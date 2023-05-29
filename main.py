@@ -190,6 +190,7 @@ async def help(ctx):
     embed.add_field(name="/toggledm", value="Toggle if DM chatting should be active", inline=False)
     embed.add_field(name="/public", value ="Toggle if bot should respond to all messages in chat", inline=False)
     embed.add_field(name="/private", value ="Toggle if bot should only respond to /chat", inline=False)
+    embed.add_field(name="/images", value ="Toggle if bot should respond with images", inline=False)
     
     await ctx.send(embed=embed)
 

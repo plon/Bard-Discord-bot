@@ -57,6 +57,7 @@
 * `/toggledm`: Toggle if DM chatting should be active
 * `/public`: Toggle if bot should respond to all messages in chat
 * `/private`: Toggle if bot should only respond to /chat
+* `/images`: Toggle if bot should respond with images
 
 ## Credits
 
