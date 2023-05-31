@@ -54,7 +54,12 @@ async def generate_response(prompt):
     if current_chunk:
         chunks.append(" ".join(current_chunk))
 
-    return chunks
+    formatted_chunks = []
+    for chunk in chunks:
+        formatted_chunk = chunk.replace(" * ", "\n* ")
+        formatted_chunks.append(formatted_chunk)
+        
+    return formatted_chunks
 
 @bot.event
 async def on_message(message):
