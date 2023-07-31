@@ -1,3 +1,2 @@
-discord==2.2.3
-GoogleBard==1.2.0
-python-dotenv
+discord
+bardapi
