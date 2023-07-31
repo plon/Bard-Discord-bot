@@ -4,8 +4,6 @@
 
 * run pip3 install -r requirements.txt
 
-* Rename the file `example.env` to `.env`
-
 ## Step 1: Create a Discord bot
 
 1. Go to https://discord.com/developers/applications create an application
@@ -13,7 +11,7 @@
 3. Get the token from bot setting
 
    ![image](https://user-images.githubusercontent.com/89479282/205949161-4b508c6d-19a7-49b6-b8ed-7525ddbef430.png)
-4. Store the token to `.env` under the `DISCORD_BOT_TOKEN`
+4. Store the token to `config.ini` under `discord_bot_token`
 
    <img height="190" width="390" alt="image" src="https://user-images.githubusercontent.com/89479282/222661803-a7537ca7-88ae-4e66-9bec-384f3e83e6bd.png">
 
@@ -49,22 +47,12 @@
 ## Commands
 
 * `/help`: Displays a list of all available commands
-* `/toggledm`: Toggles direct message mode
-* `/toggleactive`: Toggles channel mode for a channel
 * `/chat`: Chat with Bard
 * `/reset`: Reset bot's context
-* `/togglechannel`: Add the channel you are currently in to the Active Channel List
-* `/toggledm`: Toggle if DM chatting should be active
 * `/public`: Toggle if bot should respond to all messages in chat
 * `/private`: Toggle if bot should only respond to /chat
 * `/images`: Toggle if bot should respond with images
 
 ## Credits
 
-This program is based on the work of [mishalhossin](https://github.com/mishalhossin), [Zero6992](https://github.com/zero6992), and [acheong08](https://github.com/acheong08)
-
-For more information, please visit the following repositories:
-
-* https://github.com/mishalhossin/Discord-Chatbot-Gpt4Free
-* https://github.com/Zero6992/chatGPT-discord-bot
-* https://github.com/acheong08/Bard
+Some of this README.md is from [Zero6992](https://github.com/zero6992)
