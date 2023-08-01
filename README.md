@@ -2,7 +2,7 @@
 
 ## Prerequisites to install
 
-* run pip3 install -r requirements.txt
+* run ```pip3 install -r requirements.txt```
 
 ## Step 1: Create a Discord bot
 
