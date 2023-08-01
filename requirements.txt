@@ -1,2 +1,2 @@
 discord
-bardapi
+bardapi==0.1.30

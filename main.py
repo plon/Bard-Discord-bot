@@ -30,10 +30,20 @@ async def reset(interaction: discord.Interaction):
     await interaction.followup.send("Chat context successfully reset.")
     return
     
-
 @bot.tree.command(name="chat", description="Chat with Bard")
 async def chat(interaction: discord.Interaction, prompt: str, image: discord.Attachment = None):
     await interaction.response.defer()
+    if image is not None:
+        if not image.content_type.startswith('image/'):
+            await interaction.response.send_message("File must be an image")
+            return
+        response = await bard.ask_about_image(prompt, await image.read())
+        if len(response['content']) > 2000:
+            embed = discord.Embed(title="Response", description=response['content'], color=0xf1c40f)
+            await interaction.followup.send(embed=embed)
+        else:
+            await interaction.followup.send(response['content'])
+            return
     response = await generate_response(prompt) 
     if len(response['content']) > 2000:
         embed = discord.Embed(title="Response", description=response['content'], color=0xf1c40f)
