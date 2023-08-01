@@ -124,6 +124,8 @@ async def help(interaction: discord.Interaction):
     embed.add_field(name="/private", value="Set bot to only respond to /chat", inline=False)
     embed.add_field(name="/images", value="Toggle if bot should respond with images", inline=False)
 
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    
 def read_config():
     config = configparser.ConfigParser()
     config.read("config.ini")
