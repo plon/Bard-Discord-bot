@@ -53,9 +53,7 @@ async def chat(interaction: discord.Interaction, prompt: str, image: discord.Att
     return
 
 async def generate_response(prompt):
-    max_length = 1950
     response = await bard.get_answer(prompt)
-    # if "unable to get response" not in response["content"]
     if not "Unable to get response." in response["content"]:
         config = read_config()
         if config.getboolean("SETTINGS", "use_images"):
@@ -63,8 +61,6 @@ async def generate_response(prompt):
             if images:
                 for image in images:
                     response["content"] += f"\n{image}"
-        # check image perms
-        # check tts terms
         return response
     
 @bot.tree.command(name="public", description = "Bot will respond to all messages")
@@ -125,6 +121,7 @@ async def help(interaction: discord.Interaction):
     embed.add_field(name="/images", value="Toggle if bot should respond with images", inline=False)
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
+    return
     
 def read_config():
     config = configparser.ConfigParser()
