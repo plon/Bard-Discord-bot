@@ -39,11 +39,6 @@
 ## Step 4. Invite the bot
 ![image](https://user-images.githubusercontent.com/91066601/236673317-64a1789c-f6b1-48d7-ba1b-dbb18e7d802a.png)
 
-## Modes
-
-* **Direct message mode:** The bot can be used to chat with users in direct messages. To enable this mode, use the `/toggledm` command
-* **Channel mode:** The bot can be used to chat with users in channels. To enable this mode for a channel, use the `/toggleactive` command
-
 ## Commands
 
 * `/help`: Displays a list of all available commands
