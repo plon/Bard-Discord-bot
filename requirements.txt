@@ -1,2 +1,2 @@
-discord
-bardapi==0.1.30
+discord==2.3.2
+bardapi==0.1.32
