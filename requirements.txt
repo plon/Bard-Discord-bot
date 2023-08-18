@@ -1,2 +1,2 @@
 discord==2.3.2
-bardapi==0.1.32
+bardapi==0.1.33
